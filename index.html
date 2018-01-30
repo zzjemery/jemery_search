@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>杰米搜索</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        #search {
+            width: 30%;
+            height: 100%;
+            position: fixed;
+            top: 25%;
+            left: 37%;
+        }
+        
+        input {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            width: 85%;
+            height: 5%;
+            box-shadow: none;
+            /* font-size: 1.4em; */
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+            border: 1px solid #c8cccf;
+            color: #6a6f77;
+            /* outline: 0; */
+            text-indent: 1em;
+        }
+        
+        ul {
+            margin-top: 0px;
+            list-style: none;
+            background-color: #fff;
+            width: 80.1%;
+            border: 1px solid #6a6f77;
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+            padding-left: 20px;
+        }
+        
+        ul li {
+            margin: 5px;
+            cursor: pointer;
+        }
+        
+        gray {
+            background-color: #ccc;
+        }
+    </style>
+</head>
+<script src="./vue.js"></script>
+<script src="./vue-resource.js"></script>
+<script src="./doAdblock.js"></script>
+<script src="./jquery-3.2.1.js"></script>
+<script>
+    window.onload = function() {
+        new Vue({
+            el: '#search',
+            data: {
+                msg: '',
+                arr: [],
+                now: -1
+            },
+            methods: {
+                get: function(ev) {
+                    if (ev.keyCode == 38 || ev.keyCode == 40) return;
+                    //当按下enter键时，打开新页面
+                    if (ev.keyCode == 13) {
+                        window.open('https://www.baidu.com/s?wd=' + this.msg);
+                        this.msg = ''; //清空输入框
+                    }
+                    this.$http.jsonp('https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su', {
+                        wd: this.msg
+                    }, {
+                        jsonp: 'cb'
+                    }).then(function(res) {
+                        this.arr = res.data.s;
+                    }, function() {
+
+                    });
+                },
+                changeDown: function() {
+                    this.now++;
+                    if (this.now == this.arr.length) this.now = -1;
+                    this.msg = this.arr[this.now];
+                },
+                changeUp: function() {
+                    this.now--;
+                    if (this.now == -2) this.now = this.arr.length - 1;
+                    this.msg = this.arr[this.now];
+                }
+            }
+        });
+
+
+    }
+    $(document).ready(function() {
+        $("#txt").focus();
+    });
+</script>
+
+<body>
+
+    <canvas id="cas">
+       
+    </canvas>
+    <div id="search">
+        <input id="txt" type="text" v-model='msg' @keyup="get($event)" @keydown.down="changeDown()" @keydown.up.prevent="changeUp()">
+        <!-- <div class="input" v-model='msg' @keyup="get($event)" @keydown.down="changeDown()" @keydown.up.prevent="changeUp()"></div> -->
+        <ul v-show="arr.length!==0">
+            <li class="oli" v-for="val in arr" :class="{gray:$index==now}">{{val}}</li>
+            <script>
+                document.addEventListener('click', function() {
+                    var target = event.target;
+                    var data = target.innerHTML;
+                    if (data == '') return;
+                    else {
+                        window.open('https://www.baidu.com/s?wd=' + data);
+                    }
+
+                })
+            </script>
+        </ul>
+
+    </div>
+
+    <script src="index.js">
+    </script>
+</body>
+
+</html>
